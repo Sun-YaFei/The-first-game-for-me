@@ -1,91 +1,65 @@
 #include "Game.hpp"
 
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/event.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-
 #include <atomic>
 #include <chrono>
 #include <thread>
 
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/event.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/terminal.hpp>
+
 int main() {
-  using namespace ftxui;
-  using namespace std::chrono_literals;
+    using namespace ftxui;
+    using namespace std::chrono_literals;
 
-  Game game;
+    auto dims = Terminal::Size();
+    int cw = dims.dimx > 10 ? dims.dimx : 80;
+    int ch = dims.dimy > 5  ? dims.dimy : 24;
 
-  auto screen = ScreenInteractive::Fullscreen();
+    bfg::Game game;
+    game.Init(cw, ch);
 
-  std::atomic<bool> running = true;
+    auto screen = ScreenInteractive::Fullscreen();
 
-  auto renderer = Renderer([&] {
-    return game.Render();
-  });
+    std::atomic<bool> running{true};
 
-  auto component = CatchEvent(renderer, [&](Event event) {
-    if (event == Event::Custom) {
-      game.Tick();
-      return true;
-    }
+    // Game tick thread at ~12 FPS
+    std::thread timer([&] {
+        while (running) {
+            std::this_thread::sleep_for(80ms);
+            screen.Post(Event::Custom);
+        }
+    });
 
-    if (event == Event::ArrowUp || event == Event::Character('w') ||
-        event == Event::Character('W')) {
-      game.MovePlayer(0, -1);
-      return true;
-    }
+    auto quit = screen.ExitLoopClosure();
 
-    if (event == Event::ArrowDown || event == Event::Character('s') ||
-        event == Event::Character('S')) {
-      game.MovePlayer(0, 1);
-      return true;
-    }
+    auto renderer = Renderer([&] {
+        return game.Render();
+    });
 
-    if (event == Event::ArrowLeft || event == Event::Character('a') ||
-        event == Event::Character('A')) {
-      game.MovePlayer(-1, 0);
-      return true;
-    }
+    auto component = CatchEvent(renderer, [&](Event event) -> bool {
+        // Quit: Q works everywhere
+        if (event == Event::Character('q') || event == Event::Character('Q')) {
+            quit();
+            return true;
+        }
 
-    if (event == Event::ArrowRight || event == Event::Character('d') ||
-        event == Event::Character('D')) {
-      game.MovePlayer(1, 0);
-      return true;
-    }
+        // Game tick
+        if (event == Event::Custom) {
+            game.Update();
+            return true;
+        }
 
-    if (event == Event::Character(' ')) {
-      game.TogglePause();
-      return true;
-    }
+        game.OnKey(event);
+        return false;
+    });
 
-    if (event == Event::Character('r') || event == Event::Character('R')) {
-      game.Reset();
-      return true;
-    }
+    screen.Loop(component);
 
-    if (event == Event::Character('q') || event == Event::Character('Q') ||
-        event == Event::Escape) {
-      running = false;
-      screen.ExitLoopClosure()();
-      return true;
-    }
+    running = false;
+    timer.join();
 
-    return false;
-  });
-
-  std::thread ticker([&] {
-    while (running) {
-      std::this_thread::sleep_for(120ms);
-      screen.PostEvent(Event::Custom);
-    }
-  });
-
-  screen.Loop(component);
-
-  running = false;
-
-  if (ticker.joinable()) {
-    ticker.join();
-  }
-
-  return 0;
+    return 0;
 }
