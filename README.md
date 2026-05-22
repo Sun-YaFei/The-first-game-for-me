@@ -1,76 +1,170 @@
-# The-first-game-for-me
-# Big Fish Eat Small Fish
+# Big Fish Game
 
-## 1. Project Introduction
+A terminal-based "big fish eats small fish" game built with C++17 and FTXUI.
 
-This project is a terminal-based mini game developed with C++ and the FTXUI library. The game is called **Big Fish Eat Small Fish**. The player controls a fish in an ocean map, eats fish that are smaller than or equal to itself, gains points, and gradually grows larger. If the player touches a fish that is larger than itself, the game ends.
+Navigate the ocean as a growing predator — eat smaller fish to grow, avoid bigger fish to survive, and try to become the biggest fish in the sea.
 
-The project is written in C++17 and uses FTXUI to create a colorful terminal user interface, including a game map, status panel, growth progress bar, pause function, restart function, and game-over message.
+## Preview
 
+```
+  ~  ~       ~  ~    ,>     ~  ~     ~       ~  ~
+~    =[#]> ~    ~  ~        ~~>      ~   ~    ~~~~>
+    ~     ~       ~  ~    ~     ~  ~     ~  ~
+  ~    <~     ~  ~     ~       ~   ~     ~      ~
+```
+
+## Requirements
+
+- **C++17** or later
+- **CMake** 3.16+
+- A terminal with **true-color** support (recommended)
+
+## Quick Start
+
+```bash
+# Configure
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+# Build
+cmake --build build
+
+# Run (Linux / macOS / WSL)
+./build/big_fish_game
+
+# Run (Windows MSVC)
+./build/Release/big_fish_game.exe
+```
+
+FTXUI is fetched automatically via CMake `FetchContent` — no manual dependency installation needed.
+
+### Run in VSCode
+
+#### Method 1 — CMake Tools Extension (Recommended)
+
+1. Install the **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)** extension.
+2. Open the project folder in VSCode.
+3. Press `Ctrl+Shift+P` and run **CMake: Configure**. Select a kit (GCC, Clang, or MSVC).
+4. Press `Ctrl+Shift+P` and run **CMake: Build**.
+5. Open a terminal in VSCode (`` Ctrl+` ``) and run:
+
+```bash
+# Linux / macOS / WSL
+./build/big_fish_game
+
+# Windows (MSVC)
+.\build\Release\big_fish_game.exe
+```
+
+> **Note:** VSCode's integrated terminal fully supports the game's fullscreen mode.
+
+#### Method 2 — Terminal Only
+
+1. Open the project folder in VSCode.
+2. Open the integrated terminal (`` Ctrl+` ``).
+3. Run the build commands directly:
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+4. Execute the game as shown above.
+5. Press `Q` to quit the game at any time.
 
 ---
 
-## 2. Project Features
+### Run in GitHub Codespaces
 
-1. **Developed with C++**
+1. Open your repository in GitHub Codespaces (click **Code → Codespaces → Create codespace on main**).
+2. Once the workspace loads, install the required build tools in the terminal:
 
-   The project uses C++17 and is suitable for learning classes, structs, functions, random numbers, game loops, and basic project organization.
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential cmake
+```
 
-2. **Terminal UI with FTXUI**
+3. Configure and build the project:
 
-   Compared with simple `cout` output, FTXUI provides a more attractive terminal interface with colors, borders, layouts, and keyboard interaction.
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
 
-3. **Fish-shaped character design**
+4. Run the game:
 
-   Fish are displayed using character combinations, such as:
+```bash
+./build/big_fish_game
+```
 
-   - `><>`: small fish
-   - `<><`: small fish facing the opposite direction
-   - `>O>`: medium fish
-   - `>#>`: large fish
+5. Press `Q` to quit.
 
-4. **Color distinction**
+> **Tip:** For the best visual experience in Codespaces, maximize the terminal panel or open it in a new browser tab via the terminal's dropdown menu.
 
-   Different objects are displayed with different colors:
+## How to Play
 
-   - Yellow background: player fish
-   - Cyan background: small fish that can be eaten
-   - Green background: same-size fish that can be eaten
-   - Red background: dangerous large fish
+| Key | Action |
+|-----|--------|
+| `W` / `↑` | Move up |
+| `S` / `↓` | Move down |
+| `A` / `←` | Move left |
+| `D` / `→` | Move right |
+| `Q` | Quit |
+| `R` | Restart (after game over) |
+| `Enter` / `Space` | Start game |
 
-5. **Opening protection stage**
+### Rules
 
-   During the first 5 seconds, no other fish will appear on the map. Only the player fish is shown, giving the player time to prepare.
+- Eat fish **smaller** than you to gain points and grow.
+- Fish **larger** than you will eat you — game over.
+- Reach **size 10** to win the game.
+- The ocean gets more dangerous as your score increases.
 
-6. **Faster player movement**
+### Fish Types
 
-   The player fish moves faster than other fish. The player moves 2 grid cells at a time.
+| Type | Size | Speed | Color | Rarity |
+|------|------|-------|-------|--------|
+| Sardine | 1–3 | Fast | White | Common |
+| Clownfish | 2–4 | Medium | Orange | Common |
+| Tuna | 4–6 | Slow | Steel Blue | Uncommon |
+| Shark | 6–8 | Medium | Grey | Rare |
+| Whale | 8–10 | Very Slow | Dark Blue | Very Rare |
 
-7. **Horizontal fish movement**
+### Scoring
 
-   Other fish enter from the left or right side of the map and only move horizontally. They do not chase the player or escape from the player.
+- Points per fish = fish size × 10
+- Growth thresholds: 10, 25, 50, 80, 120, 180, 250, 350, 500, 700 points
 
-8. **Basic game functions**
+## Project Structure
 
-   The game includes:
-
-   - Score system
-   - Fish growth system
-   - Pause and continue
-   - Restart
-   - Game-over detection
-   - Keyboard control
-
----
-
-## 3. Project Structure
-
-```text
+```
 big_fish_game/
-├── CMakeLists.txt
-├── README.md
 ├── include/
-│   └── Game.hpp
-└── src/
-    ├── Game.cpp
-    └── main.cpp
+│   └── Game.hpp          # Game class and struct declarations
+├── src/
+│   ├── Game.cpp          # Game logic and rendering
+│   └── main.cpp          # Entry point and FTXUI event loop
+├── CMakeLists.txt         # Build configuration
+├── .gitignore
+└── README.md
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/cool-thing`
+3. Commit your changes: `git commit -m "Add cool thing"`
+4. Push to the branch: `git push origin feature/cool-thing`
+5. Open a pull request
+
+### Ideas for Contributions
+
+- Power-ups (speed boost, invincibility, magnet)
+- High-score persistence
+- Additional fish types and behaviors
+- Multiplayer mode
+- Sound effects
+- Color theme customization
+
+## License
+
+This project is provided for educational and personal use. Feel free to modify and share.
