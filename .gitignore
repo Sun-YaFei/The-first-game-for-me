@@ -1,13 +1,26 @@
-# Build output
-/build/
-
-# Claude Code
-.claude/
+# Build
+build/
+cmake-build-*/
+out/
+*.o
+*.obj
+*.exe
+*.out
 
 # IDE
-.vs/
-.vscode/
 .idea/
+.vscode/
+*.swp
+*.swo
+*~
 
-# CMake generated
-CMakeUserPresets.json
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+*.cache
+
+# Dependencies
+_deps/
