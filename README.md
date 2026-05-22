@@ -7,7 +7,6 @@ This project is a terminal-based mini game developed with C++ and the FTXUI libr
 
 The project is written in C++17 and uses FTXUI to create a colorful terminal user interface, including a game map, status panel, growth progress bar, pause function, restart function, and game-over message.
 
-This project is suitable for a C++ course assignment or an AI-assisted programming practice project. The code structure is clear and includes a CMake build file, header file, source files, and a README document.
 
 ---
 
